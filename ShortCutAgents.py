@@ -10,6 +10,7 @@ class QLearningAgent(object):
         self.alpha = alpha
         self.next_state = next_state
         action_values = [[0 for i in range (self.n_states)] for j in range (self.n_actions)]        #initialize zero 2-d array [n_states * n_actions]
+        self.action_values = action_values
         pass
         
     def select_action(self, state):

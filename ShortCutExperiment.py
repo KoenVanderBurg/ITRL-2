@@ -5,24 +5,25 @@ from ShortCutEnvironment import ShortcutEnvironment
 from ShortCutAgents import QLearningAgent, SARSAAgent, ExpectedSARSAAgent
 from Helper import LearningCurvePlot, ComparisonPlot, smooth
 
-def run_repetitions_QA(n_actions, n_timesteps, n_repetitions,epsilon):
+def run_repetitions_QA (n_actions, n_episodes, alpha , epsilon, next_state, n_states, n_rep):
     
+    all_rewards = np.zeros((n_episodes,n_actions))                    #2d-array to store all the rewards in of the n_repetitions * n_episodes.
 
-    
-    all_rewards = np.zeros((n_repetitions,n_timesteps))                    #2d-array to store all the rewards in of the n_repititions * n_timesteps.
+    for rep in range(n_rep):                                                     #for each repetition:
+        env = ShortcutEnvironment()                                              # initialize environment    
+        pi = QLearningAgent(n_actions = n_actions, n_states = n_states,
+                             alpha = alpha, epsilon = epsilon, alpha = alpha,
+                             next_state = next_state)                            # initialize policy
+        rewards =np.zeros(n_episodes)                                            # initialize rewards
+        for episode in range(n_episodes):                                        #for each repetition and timestep
+            while env.isdone == False:
 
-    for repetition in range(n_repetitions):                                #for each repetition:
+                a = pi.select_action(env.state())                                    #select action
+                r = env.step(a)                                                      #fetch reward
+                pi.update(a,r)                                                       #update policy
+                rewards[episode] = r                                                #store reward into rewards
 
-        env = BanditEnvironment(n_actions=n_actions)                            # initialize environment    
-        pi = EgreedyPolicy(n_actions=n_actions)                                 # initialize policy
-        rewards =np.zeros(n_timesteps)                                          # initialize rewards
-        for timestep in range(n_timesteps):                                #for each repetition and timestep:
-            a = pi.select_action(epsilon)                                        #select action
-            r = env.act(a)                                                       #sample reward
-            pi.update(a,r)                                                       #update policy
-            rewards[timestep] = r                                                #store reward into rewards
-
-        all_rewards[repetition] = rewards
+        all_rewards[episode] = rewards
 
     return np.average(all_rewards, 0)                                      #return the average over all the rewards
 
@@ -55,6 +56,7 @@ if __name__ == '__main__':
     alpha = 0.1
     epsilon = 0.1
     smoothing_window = 31
+    n_actions = 4
 
-    experiment(n_episodes = n_episodes,n_rep = n_rep, alpha=alpha, epsilon = epsilon, smoothing_window=smoothing_window)
+    experiment(n_actions = n_actions, n_episodes = n_episodes,n_rep = n_rep, alpha=alpha, epsilon = epsilon, smoothing_window=smoothing_window)
 
