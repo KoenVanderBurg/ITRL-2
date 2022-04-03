@@ -39,6 +39,12 @@ class QLearningAgent(object):
         self.action_values[state][action] = self.action_values[state][action] + self.alpha * ( reward + 1 * np.max(self.action_values[next_state]) - self.action_values[state][action])
         pass
 
+    def greedy_plot(self) -> np:
+        Q = self.action_values
+        return(Q)
+        
+
+
 class SARSAAgent(object):
 
     def __init__(self, n_actions, n_states, epsilon):
