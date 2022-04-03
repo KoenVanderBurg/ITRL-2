@@ -131,7 +131,7 @@ class ShortcutEnvironment(Environment):
         elif action == 3:
             if self.x<self.c-1:
                 self.x += 1
-        
+
         if self.s[self.y, self.x]=='G': # Goal reached
             self.isdone = True
             return -1

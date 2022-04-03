@@ -4,30 +4,39 @@ import numpy as np
 class QLearningAgent(object):
 
     def __init__(self, n_actions, n_states, epsilon, alpha):
+        action_values = np.zeros((n_states, n_actions))        #initialize zero 2-d array [n_states * n_actions]
+        self.action_values = action_values
         self.n_actions = n_actions
         self.n_states = n_states
         self.epsilon = epsilon
         self.alpha = alpha
-        action_values = [[0 for i in range (self.n_actions)] for j in range (self.n_states)]        #initialize zero 2-d array [n_states * n_actions]
-        self.action_values = action_values
         pass
-        
+
+    def josef_select_action(self, state: int) -> int:
+        rand: float = np.random.rand()
+        greedy_a: int = np.argmax(self.action_values[state])
+        if rand > self.epsilon:
+            return greedy_a
+        else:
+            expl_a = np.random.choice(self.n_actions)
+            while expl_a == greedy_a:
+                expl_a = np.random.choice(self.n_actions)
+            return expl_a
+
     def select_action(self, state):
 
-        prob = [[0 for x in range (self.n_actions)] for j in range(self.n_states)]                   #create probabilities 2-d array  
+        prob = [0 for x in range (self.n_actions)]                                             #create probabilities 2-d array  
 
         for action in range(self.n_actions):
-            print(action)
             if action == np.argmax(self.action_values[state]):
-                prob[state][action] = (1 - self.epsilon)                                               #assign highest mean of action the highest probability. 
+                prob[action] = (1 - self.epsilon)                                               #assign highest mean of action the highest probability. 
             else:
-                prob[state][action] = (self.epsilon/(self.n_actions - 1))                              #assign rest of probability values to rest of the actions.
+                prob[action] = (self.epsilon/(self.n_actions - 1))                              #assign rest of probability values to rest of the actions.
+
+        return(np.random.choice(self.n_actions, p = prob))                                      #return a random action based on the probabilities.
         
-        return(np.random.choice(self.n_actions, p = prob[state]))                                          #return a random action based on the probabilities.
-        
-    def update(self, state, action, reward):
-        next_state = (state + 1)
-        self.action_values[state][action] = self.action_values[state][action] + self.alpha * ( reward + 1 * np.argmax(self.action_values[next_state]) - self.action_values[state][action])
+    def update(self, state, next_state, action, reward):
+        self.action_values[state][action] = self.action_values[state][action] + self.alpha * ( reward + 1 * np.max(self.action_values[next_state]) - self.action_values[state][action])
         pass
 
 class SARSAAgent(object):
