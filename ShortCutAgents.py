@@ -12,7 +12,7 @@ class QLearningAgent(object):
         self.alpha = alpha
         pass
 
-    def josef_select_action(self, state: int) -> int:
+    def select_action(self, state: int) -> int:
         rand: float = np.random.rand()
         greedy_a: int = np.argmax(self.action_values[state])
         if rand > self.epsilon:
@@ -23,7 +23,7 @@ class QLearningAgent(object):
                 expl_a = np.random.choice(self.n_actions)
             return expl_a
 
-    def select_action(self, state):
+    def koen_select_action(self, state):
 
         prob = [0 for x in range (self.n_actions)]                                             #create probabilities 2-d array  
 
@@ -37,7 +37,7 @@ class QLearningAgent(object):
         
     def update(self, state, next_state, action, reward):
         self.action_values[state][action] = self.action_values[state][action] + self.alpha * ( reward + 1 * np.max(self.action_values[next_state]) - self.action_values[state][action])
-        pass
+        return self.action_values
 
     def greedy_plot(self) -> np:
         Q = self.action_values

@@ -16,9 +16,9 @@ class LearningCurvePlot:
 
     def __init__(self,title=None):
         self.fig,self.ax = plt.subplots()
-        self.ax.set_xlabel('Time')
-        self.ax.set_ylabel('Reward')      
-        self.ax.set_ylim([0,1.0])
+        self.ax.set_xlabel('n_reps')
+        self.ax.set_ylabel('Average reward')      
+        #self.ax.set_ylim([0,1.0])
         if title is not None:
             self.ax.set_title(title)
         
@@ -27,8 +27,8 @@ class LearningCurvePlot:
         label: string to appear as label in plot legend '''
         if label is not None:
             self.ax.plot(y,label=label)
-        else:
-            self.ax.plot(y, color = 'grey', alpha = 0.2)
+       # else:
+           # self.ax.plot(y, color = 'grey', alpha = 0.2)
         
     def save(self,name='test.png'):
         ''' name: string for filename of saved figure '''
@@ -41,8 +41,8 @@ class ComparisonPlot:
         self.fig,self.ax = plt.subplots()
         self.ax.set_xlabel('Parameter (exploration)')
         self.ax.set_ylabel('Average reward') 
-        self.ax.set_xscale('log')
-        self.ax.set_xticks(ticks=[0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.0], labels=[0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.0])
+      #  self.ax.set_xscale('log')
+       # self.ax.set_xticks(ticks=[0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.0], labels=[0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.0])
         if title is not None:
             self.ax.set_title(title)
         
