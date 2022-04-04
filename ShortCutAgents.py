@@ -47,21 +47,30 @@ class QLearningAgent(object):
 
 class SARSAAgent(object):
 
-    def __init__(self, n_actions, n_states, epsilon):
+    def __init__(self, n_actions, n_states, epsilon, alpha):
+        action_values = np.zeros((n_states, n_actions))        #initialize zero 2-d array [n_states * n_actions]
+        self.action_values = action_values
         self.n_actions = n_actions
         self.n_states = n_states
         self.epsilon = epsilon
-        # TO DO: Add own code
+        self.alpha = alpha
         pass
         
     def select_action(self, state):
-        # TO DO: Add own code
-        a = random.choice(range(self.n_actions)) # Replace this with correct action selection
-        return a
+        rand: float = np.random.rand()
+        greedy_a: int = np.argmax(self.action_values[state])
+        if rand > self.epsilon:
+            return greedy_a
+        else:
+            expl_a = np.random.choice(self.n_actions)
+            while expl_a == greedy_a:
+                expl_a = np.random.choice(self.n_actions)
+            return expl_a
         
-    def update(self, state, action, reward):
-        # TO DO: Add own code
-        pass
+    def update(self, state, action, reward, next_state, next_action):
+        self.action_values[state][action] = self.action_values[state][action] + self.alpha * ( reward + 1 * (self.action_values[next_state][next_action]) - self.action_values[state][action])
+        return self.action_values        
+        
 
 class ExpectedSARSAAgent(object):
 
