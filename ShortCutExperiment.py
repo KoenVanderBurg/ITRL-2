@@ -10,43 +10,59 @@ from Helper import LearningCurvePlot, ComparisonPlot, smooth
 
 def run_repetitions_QA( n_episodes, all_rewards,rewards, pi,rep, environment):
 
-    for episode in range(n_episodes):                                        #for each repetition and episode
-        env = environment()                                                     # initialize environment
+    for episode in range(n_episodes):                                           
+        env = environment()                                                      # initialize environment
 
         while env.done() == False:
-            c_state = env.state()                                                #current state
-            a = pi.select_action(c_state)                                        #select action
-            r = env.step(a)                                                      #make move -> get reward
-            q = pi.update(c_state, env.state(),a,r)                                  #update policy
-            rewards[episode] += r                                                #store reward into rewards
+            c_state = env.state()                                                # current state
+            a = pi.select_action(c_state)                                        # select action
+            r = env.step(a)                                                      # make move -> get reward
+            q = pi.update(c_state, env.state(),a,r)                              # update policy -> store action_values
+            rewards[episode] += r                                                # store reward into rewards
 
-        all_rewards[rep][episode] = rewards[episode]
+        all_rewards[rep][episode] = rewards[episode]                             # update all rewards
     
-    return (np.average(all_rewards, 0), q)                                             #return the average over all the rewards
+    return (np.average(all_rewards, 0), q)                                       # return the average over all the rewards
 
 def run_repetitions_SARSA( n_episodes, all_rewards,rewards, pi,rep,environment):
 
-    for episode in range(n_episodes):                                        #for each repetition and episode
-        env = environment()                                             # initialize environment
+    for episode in range(n_episodes):                                        
+        env = environment()                                             
         a = pi.select_action(env.state())
 
         while env.done() == False:
-            c_state = env.state()                                                #current state
-            r = env.step(a)                                                      #make move -> get reward
-            rewards[episode] += r                                                #store reward into rewards 
-            na = pi.select_action(env.state())                                   #storing the next_action
-            q = pi.update(c_state, a, r, env.state(), na)                        #update policy, state, action, reward, next_state, next_action
-            a = na                                                               #Action is next_action
+            c_state = env.state()                                                # current state
+            r = env.step(a)                                                      # make move -> get reward
+            rewards[episode] += r                                                # store reward into rewards 
+            na = pi.select_action(env.state())                                   # storing the next_action
+            q = pi.update(c_state, a, r, env.state(), na)                        # update policy, state, action, reward, next_state, next_action
+            a = na                                                               # action is next_action
 
         all_rewards[rep][episode] = rewards[episode]
     
-    return (np.average(all_rewards, 0), q)                                             #return the average over all the rewards
+    return (np.average(all_rewards, 0), q)                                       # return the average over all the rewards
 
- 
-def experiment_SARSA(n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_states, environment, alpha = None):
+def run_repetitions_EXP_SARSA( n_episodes, all_rewards,rewards, pi,rep,environment):
 
-    plot = LearningCurvePlot('Learning Curves SARSA Agent')
-    plot2 = LearningCurvePlot('Learning Curves SARSA Agent Final Run')
+    for episode in range(n_episodes):                                       
+        env = environment()                                                     
+        a = pi.select_action(env.state())                                        # pre-select an action before entering loop
+
+        while env.done() == False:
+            c_state = env.state()                                                
+            r = env.step(a)                                                      
+            rewards[episode] += r                                                 
+            na = pi.select_action(env.state())                                   
+            q = pi.update(c_state, a, r, env.state())                        
+            a = na                                                               
+
+        all_rewards[rep][episode] = rewards[episode]
+    
+    return (np.average(all_rewards, 0), q)                                             
+
+def experiment_EXP_SARSA(n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_states, environment, alpha = None):
+
+    plot = LearningCurvePlot('Learning Curves Expected SARSA Agent')
 
     if alpha == None:
         alphas = [0.01, 0.1, 0.5, 0.9]
@@ -54,21 +70,56 @@ def experiment_SARSA(n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_
         alphas = [alpha]
          
     average_returns_Q = []
-    all_rewards = np.zeros((n_rep, n_episodes))                    #2d-array to store all the rewards in of the n_repetitions * n_episodes.
+    all_rewards = np.zeros((n_rep, n_episodes))                                                                    # 2d-array to store all the rewards in of the n_repetitions * n_episodes.
 
-    for alpha in alphas:
-        for rep in range(n_rep):                                                     #for each repetition:
-            print(f"SARSA Now loading alpha: {alpha}, done {rep + 1} / {n_rep} reps", end = '\r')
-            rewards = np.zeros(n_episodes)                                             # initialize rewards
-            pi = SARSAAgent(n_actions = n_actions, n_states = n_states,
-                                alpha = alpha, epsilon = epsilon)                            # initialize policy  
+    for alpha in alphas:                                                                                           # for each alpha
+        for rep in range(n_rep):                                                                                   # for each repetition:
+            print(f"EXP-SARSA Now loading alpha: {alpha}, done {rep + 1} / {n_rep} reps", end = '\r')              # progress bar
+            rewards = np.zeros(n_episodes)                                                                         # initialize rewards
+            pi = ExpectedSARSAAgent(n_actions = n_actions, n_states = n_states,
+                                alpha = alpha, epsilon = epsilon)                                                  # initialize policy  
+
             if rep == (n_rep -1):
                 print('\n')
-                final_run_tuple = run_repetitions_SARSA(n_episodes, all_rewards, rewards, pi, rep, environment)
-                final_run = final_run_tuple[0]
-                plot2.add_curve((final_run), label= f'{alpha = }')
 
-            rewards_tuple = run_repetitions_SARSA( n_episodes, all_rewards,rewards,pi,rep)
+            rewards_tuple = run_repetitions_EXP_SARSA( n_episodes, all_rewards,rewards,pi,rep, environment)        # do repetitions 
+            average_returns_Q.append(np.average(rewards_tuple[0]))                                                 # append the average reward
+
+
+        plot.add_curve((average_returns_Q))
+        plot.add_curve(smooth(rewards,smoothing_window), label = f'{alpha = }')
+
+    if len(alphas) == 1:
+        if environment == WindyShortcutEnvironment:
+            print(f"EXP-SARSA ~ Windy (alpha: {alpha}) plot for {n_episodes} episodes and {n_rep} rep")
+        else:
+            print(f"EXP-SARSA (alpha: {alpha}) plot for {n_episodes} episodes and {n_rep} rep")
+        print_greedy_actions(rewards_tuple[1])
+    else:
+       plot.save("EXP-SARSA_1_average.png")
+ 
+def experiment_SARSA(n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_states, environment, alpha = None):
+
+    plot = LearningCurvePlot('Learning Curves SARSA Agent')
+
+    if alpha == None:
+        alphas = [0.01, 0.1, 0.5, 0.9]
+    else:
+        alphas = [alpha]
+         
+    average_returns_Q = []
+    all_rewards = np.zeros((n_rep, n_episodes))                    
+
+    for alpha in alphas:
+        for rep in range(n_rep):                                                   
+            print(f"SARSA Now loading alpha: {alpha}, done {rep + 1} / {n_rep} reps", end = '\r')
+            rewards = np.zeros(n_episodes)                                          
+            pi = SARSAAgent(n_actions = n_actions, n_states = n_states,
+                                alpha = alpha, epsilon = epsilon)                            
+            if rep == (n_rep -1):
+                print('\n')
+
+            rewards_tuple = run_repetitions_SARSA( n_episodes, all_rewards,rewards,pi,rep, environment)
             average_returns_Q.append(np.average(rewards_tuple[0])) 
 
 
@@ -81,14 +132,12 @@ def experiment_SARSA(n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_
         else:
             print(f"SARSA (alpha: {alpha}) plot for {n_episodes} episodes and {n_rep} rep")
         print_greedy_actions(rewards_tuple[1])
-
-    plot.save("SARSA_1_average.png")
-    #plot2.save("SARSA_1_final_run.png")
+    else:
+        plot.save("SARSA_1_average.png")
 
 def experiment_QA( n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_states, environment, alpha = None, ):
     
     plot = LearningCurvePlot('Learning Curves Q-Learning Agent')
-    plot2 = LearningCurvePlot('Learning Curves Q-Learning Agent Final Run')
 
     if alpha == None:
         alphas = [0.01, 0.1, 0.5, 0.9]
@@ -96,19 +145,16 @@ def experiment_QA( n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_st
         alphas = [alpha]
 
     average_returns_Q = []
-    all_rewards = np.zeros((n_rep, n_episodes))                    #2d-array to store all the rewards in of the n_repetitions * n_episodes.
+    all_rewards = np.zeros((n_rep, n_episodes))                  
 
     for alpha in alphas:
-        for rep in range(n_rep):                                                     #for each repetition:
+        for rep in range(n_rep):                                                    
             print(f"QA: Now loading alpha: {alpha}, done {rep + 1} / {n_rep} reps", end = '\r')
-            rewards = np.zeros(n_episodes)                                             # initialize rewards
+            rewards = np.zeros(n_episodes)                                            
             pi = QLearningAgent(n_actions = n_actions, n_states = n_states,
-                                alpha = alpha, epsilon = epsilon)                            # initialize policy  
+                                alpha = alpha, epsilon = epsilon)                              
             if rep == (n_rep -1):
                 print("\n")
-                final_run_tuple = run_repetitions_QA(n_episodes, all_rewards,rewards, pi,rep,environment )
-                final_run = final_run_tuple[0]
-                plot2.add_curve((final_run), label= f'{alpha = }')
 
             rewards_tuple = run_repetitions_QA(n_episodes, all_rewards,rewards, pi,rep,environment)
             average_returns_Q.append(np.average(rewards_tuple[0])) 
@@ -123,10 +169,8 @@ def experiment_QA( n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_st
         else:
             print(f"QA (alpha: {alpha}) plot for {n_episodes} episodes and {n_rep} rep")
         print_greedy_actions(rewards_tuple[1])
-
-
-    plot.save("QA_1_average.png")
-    #plot2.save("QA_2_final_run.png")
+    else:
+        plot.save("QA_1_average.png")
     
 
 def print_greedy_actions(Q):
@@ -149,6 +193,8 @@ def run_experiment( n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_s
     experiment_SARSA(n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_states, environment = ShortcutEnvironment)
     experiment_SARSA(n_actions, 10000, 1, epsilon, smoothing_window, n_states, environment = ShortcutEnvironment, alpha = 0.1)
     experiment_SARSA(n_actions, 10000, 1, epsilon, smoothing_window, n_states, environment = WindyShortcutEnvironment, alpha = 0.1)
+    experiment_EXP_SARSA(n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_states, environment = ShortcutEnvironment)
+    experiment_EXP_SARSA(n_actions, 10000, 1, epsilon, smoothing_window, n_states, environment = ShortcutEnvironment, alpha = 0.1)
 
     
 if __name__ == '__main__':
