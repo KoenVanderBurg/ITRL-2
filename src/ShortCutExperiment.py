@@ -57,7 +57,7 @@ def run_repetitions_EXP_SARSA( n_episodes, all_rewards,rewards, pi,rep,environme
             a = na                                                               
 
         all_rewards[rep][episode] = rewards[episode]
-    
+
     return (np.average(all_rewards, 0), q)                                             
 
 def experiment_EXP_SARSA(n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_states, environment, alpha = None):
@@ -187,14 +187,14 @@ def print_greedy_actions(Q):
     print(print_string.tobytes().decode('utf-8'))
 
 def run_experiment( n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_states):
-    experiment_QA(n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_states, environment =  ShortcutEnvironment)
-    experiment_QA(n_actions, 10000, 1, epsilon, smoothing_window, n_states, environment = ShortcutEnvironment, alpha = 0.1)
+    #experiment_QA(n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_states, environment =  ShortcutEnvironment)
+    #experiment_QA(n_actions, 10000, 1, epsilon, smoothing_window, n_states, environment = ShortcutEnvironment, alpha = 0.1)
     experiment_QA(n_actions, 10000, 1, epsilon, smoothing_window, n_states, environment = WindyShortcutEnvironment, alpha = 0.1,)
     experiment_SARSA(n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_states, environment = ShortcutEnvironment)
     experiment_SARSA(n_actions, 10000, 1, epsilon, smoothing_window, n_states, environment = ShortcutEnvironment, alpha = 0.1)
     experiment_SARSA(n_actions, 10000, 1, epsilon, smoothing_window, n_states, environment = WindyShortcutEnvironment, alpha = 0.1)
-    experiment_EXP_SARSA(n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_states, environment = ShortcutEnvironment)
-    experiment_EXP_SARSA(n_actions, 10000, 1, epsilon, smoothing_window, n_states, environment = ShortcutEnvironment, alpha = 0.1)
+    #experiment_EXP_SARSA(n_actions, n_episodes, n_rep, epsilon, smoothing_window, n_states, environment = ShortcutEnvironment)
+    #experiment_EXP_SARSA(n_actions, 10000, 1, epsilon, smoothing_window, n_states, environment = ShortcutEnvironment, alpha = 0.1)
 
     
 if __name__ == '__main__':
