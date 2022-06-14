@@ -7,4 +7,4 @@ In the Cliff Walking environment there is a reinforcement learning agent which h
 
 The output of the program are learning curves indicating the performance of each reinforcement learning algorithm. The learning curves are based on different learning speeds, and averaged over multiple repitions. 
 
-In order to run the script call '''python ShortCutExperiment.py '''
+In order to run the script call: ```python ShortCutExperiment.py``` 
