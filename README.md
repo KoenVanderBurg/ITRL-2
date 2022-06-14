@@ -7,9 +7,4 @@ In the Cliff Walking environment there is a reinforcement learning agent which h
 
 The output of the program are learning curves indicating the performance of each reinforcement learning algorithm. The learning curves are based on different learning speeds, and averaged over multiple repitions. 
 
-
-Project uses consistent code conventions and clear function/method/variable names
-
-The code is clearly commented, documenting intentions and edge cases
-
-There are no sensitive materials in the revision history, issues, or pull requests (for example, passwords or other non-public information)
+Running instructions: 
