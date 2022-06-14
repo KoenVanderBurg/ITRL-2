@@ -1,22 +1,10 @@
 # ITRL_2
-Assignment 2, Introduction to Reinforcement Learning
+Assignment 2, ITRL
 
+This repository was originally created as an assignment in the ITRL course. The code presents three different model-free reinforcement learning algorithms; Q- Learning, SARSA and Expected-SARSA. These algorithms are designed for learning problems such as the Cliff Walking problem, which is the current problem it was designed for.
 
-Documentation
+In the Cliff Walking environment there is a reinforcement learning agent which has two different starting points and is tasked with finding the goal and finding the optimal route. The environment of the agent contains cliffs in which the agent can fall, on which the agent is returned to its starting position.
 
+The output of the program are learning curves indicating the performance of each reinforcement learning algorithm. The learning curves are based on different learning speeds, and averaged over multiple repitions. 
 
-Project has a LICENSE file with an open source license
-
-Project has basic documentation (README, CONTRIBUTING, CODE_OF_CONDUCT)
-
-The name is easy to remember, gives some idea of what the project does, and does not conflict with an existing project or infringe on trademarks
-
-The issue queue is up-to-date, with issues clearly organized and labeled
-Code
-
-
-Project uses consistent code conventions and clear function/method/variable names
-
-The code is clearly commented, documenting intentions and edge cases
-
-There are no sensitive materials in the revision history, issues, or pull requests (for example, passwords or other non-public information)
+In order to run the script call: ```python ShortCutExperiment.py``` 
